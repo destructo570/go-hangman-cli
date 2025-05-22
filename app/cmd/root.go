@@ -104,25 +104,94 @@ func getGuessedWord(word string, currentGuess string, input string) string {
 	return string(str)
 }
 
+func printHangmanStatus(remainingAttempts int, guessedWord string) {
+	var hangmanStages = []string{
+		`
+   +---+
+   |   |
+       |
+       |
+       |
+       |
+=========`,
+		`
+   +---+
+   |   |
+   O   |
+       |
+       |
+       |
+=========`,
+		`
+   +---+
+   |   |
+   O   |
+   |   |
+       |
+       |
+=========`,
+		`
+   +---+
+   |   |
+   O   |
+  /|   |
+       |
+       |
+=========`,
+		`
+   +---+
+   |   |
+   O   |
+  /|\  |
+       |
+       |
+=========`,
+		`
+   +---+
+   |   |
+   O   |
+  /|\  |
+  /    |
+       |
+=========`,
+		`
+   +---+
+   |   |
+   O   |
+  /|\  |
+  / \  |
+       |
+=========`,
+	}
+
+	fmt.Println()
+	fmt.Println("*****************")
+	fmt.Printf("Remaining lives: %d\n", remainingAttempts)
+	fmt.Println("*****************")
+	fmt.Printf("Word: %s", guessedWord)
+	fmt.Println()
+	fmt.Println()
+	fmt.Println(hangmanStages[(len(hangmanStages)-1)-remainingAttempts])
+	fmt.Println()
+
+}
+
 func startGame() {
 	word := getRandomWord()
-	guessCount, guessSet := getGuessCount(word)
-
+	_, guessSet := getGuessCount(word)
+	lives := 6
 	guessWord := strings.Repeat("_", len(word))
 
 	for {
-		fmt.Println()
-		fmt.Println(guessWord)
-		fmt.Println()
-
+		printHangmanStatus(lives, guessWord)
 		if len(guessSet) == 0 {
 			fmt.Println("You Won! :)")
 			os.Exit(1)
-			break
-		} else if guessCount == 0 {
+
+		} else if lives == 0 {
 			fmt.Println("You Lost! :(")
 			os.Exit(1)
-			break
+
 		} else {
 			userInput := promptGetGuess()
 
@@ -131,7 +200,7 @@ func startGame() {
 				guessWord = getGuessedWord(word, guessWord, userInput)
 				delete(guessSet, userInput)
 			} else {
-				guessCount--
+				lives--
 			}
 		}
 	}
