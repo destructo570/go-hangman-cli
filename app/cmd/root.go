@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"hangman/app/constants"
 	"math/rand"
 	"os"
 	"strings"
@@ -10,18 +11,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type promptContent struct {
-	errorMsg string
-	label    string
-}
-
 var rootCmd = &cobra.Command{
 	Use:   "app",
 	Short: "A simple hangman game built in Go lang",
 	Long:  `A simple hangman game built in Go lang`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		triggerInit()
+		startGame()
 	},
 }
 
@@ -30,31 +26,6 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
-}
-
-func triggerInit() {
-	selectedOption := promptGetInput()
-	if selectedOption == "1) Start game" {
-		startGame()
-	} else {
-		os.Exit(1)
-	}
-
-}
-
-func promptGetInput() string {
-
-	prompt := promptui.Select{
-		Label: "Select One Option",
-		Items: []string{"1) Start game", "2) Exit"},
-	}
-	_, result, err := prompt.Run()
-
-	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
-		os.Exit(1)
-	}
-	return result
 }
 
 func promptGetGuess() string {
@@ -72,17 +43,16 @@ func promptGetGuess() string {
 		fmt.Printf("Prompt failed %v\n", err)
 		os.Exit(1)
 	}
-	// println("Returning")
 	return result
 }
 
 func getRandomWord() string {
-	words := []string{"shark", "dolphin", "elephant"}
+	words := constants.WordsList
 	randomNum := rand.Intn(len(words))
 	return words[randomNum]
 }
 
-func getGuessCount(word string) (int, map[string]bool) {
+func getGuessCount(word string) map[string]bool {
 	mySet := make(map[string]bool)
 	for _, char := range word {
 		_, present := mySet[string(char)]
@@ -90,7 +60,7 @@ func getGuessCount(word string) (int, map[string]bool) {
 			mySet[string(char)] = true
 		}
 	}
-	return len(mySet), mySet
+	return mySet
 }
 
 func getGuessedWord(word string, currentGuess string, input string) string {
@@ -104,86 +74,14 @@ func getGuessedWord(word string, currentGuess string, input string) string {
 	return string(str)
 }
 
-func printHangmanStatus(remainingAttempts int, guessedWord string) {
-	var hangmanStages = []string{
-		`
-   +---+
-   |   |
-       |
-       |
-       |
-       |
-=========`,
-		`
-   +---+
-   |   |
-   O   |
-       |
-       |
-       |
-=========`,
-		`
-   +---+
-   |   |
-   O   |
-   |   |
-       |
-       |
-=========`,
-		`
-   +---+
-   |   |
-   O   |
-  /|   |
-       |
-       |
-=========`,
-		`
-   +---+
-   |   |
-   O   |
-  /|\  |
-       |
-       |
-=========`,
-		`
-   +---+
-   |   |
-   O   |
-  /|\  |
-  /    |
-       |
-=========`,
-		`
-   +---+
-   |   |
-   O   |
-  /|\  |
-  / \  |
-       |
-=========`,
-	}
-
-	fmt.Println()
-	fmt.Println("*****************")
-	fmt.Printf("Remaining lives: %d\n", remainingAttempts)
-	fmt.Println("*****************")
-	fmt.Printf("Word: %s", guessedWord)
-	fmt.Println()
-	fmt.Println()
-	fmt.Println(hangmanStages[(len(hangmanStages)-1)-remainingAttempts])
-	fmt.Println()
-
-}
-
 func startGame() {
 	word := getRandomWord()
-	_, guessSet := getGuessCount(word)
+	guessSet := getGuessCount(word)
 	lives := 6
 	guessWord := strings.Repeat("_", len(word))
 
 	for {
-		printHangmanStatus(lives, guessWord)
+		constants.PrintHangmanStatus(lives, guessWord)
 		if len(guessSet) == 0 {
 			fmt.Println("You Won! :)")
 			os.Exit(1)
