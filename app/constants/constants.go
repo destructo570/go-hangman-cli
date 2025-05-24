@@ -2,8 +2,6 @@ package constants
 
 import "fmt"
 
-var WordsList = []string{"shark", "dolphin", "elephant"}
-
 func PrintHangmanStatus(remainingAttempts int, guessedWord string) {
 	var hangmanStages = []string{
 		`
