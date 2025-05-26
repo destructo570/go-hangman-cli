@@ -1,1 +1,6 @@
-## Hangman game built in GO
+## Hangman cli game built in GO
+
+
+#### Libraries
+- Cobra cli
+- Promptui
